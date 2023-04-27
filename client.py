@@ -1,15 +1,17 @@
 import asyncio
 import os
 import sys
-
+from dotenv import load_dotenv
 import zmq
 
+load_dotenv()
 DEFAULT_JSON_FILE = "command.json"
+DEFAULT_SERVER_ENDPOINT = "tcp://localhost:5555"
 
 
 async def client():
     # Define the endpoint for the server
-    server_endpoint = os.getenv("SERVER_ENDPOINT", "tcp://localhost:5555")
+    server_endpoint = os.getenv("SERVER_ENDPOINT" or DEFAULT_SERVER_ENDPOINT)
 
     # Create a ZMQ context and socket
     context = zmq.Context()
