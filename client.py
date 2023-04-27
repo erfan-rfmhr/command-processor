@@ -1,15 +1,31 @@
 import asyncio
+import json
 import os
 import sys
-from dotenv import load_dotenv
+from pprint import pprint
 import zmq
+from dotenv import load_dotenv
 
 load_dotenv()
 DEFAULT_JSON_FILE = "command.json"
 DEFAULT_SERVER_ENDPOINT = "tcp://127.0.0.1:5555"
 
 
+def format_response(command_dict: dict, execution_result: str) -> dict:
+    """Format the response to be sent back to the client."""
+    output = {
+        "given_os_command": command_dict["command_name"] + " " + " ".join(command_dict["parameters"]),
+        "result": execution_result
+    }
+    return output
+
+
 async def client():
+    """Send a request to the server and print the response.
+    The request is loaded from a JSON file.
+
+    response format: {given_os_command: <command>, result: <result>}"""
+
     # Define the endpoint for the server
     server_endpoint = os.getenv("SERVER_ENDPOINT", DEFAULT_SERVER_ENDPOINT)
 
@@ -38,7 +54,12 @@ async def client():
 
     # Wait for a response from the server
     response = socket.recv()
-    print(f"Received response from server: {response.decode()}")
+    # Decode the response and convert request to a dictionary
+    execution_result = response.decode()
+    command_dict = json.loads(request)
+    # Format the response
+    output = format_response(command_dict, execution_result)
+    pprint(output, indent=4)
 
 
 async def main():
