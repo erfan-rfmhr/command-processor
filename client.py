@@ -1,7 +1,8 @@
 import asyncio
-import zmq
-
 import os
+import sys
+
+import zmq
 
 
 async def client():
@@ -15,8 +16,12 @@ async def client():
     # Connect the socket to the endpoint
     socket.connect(server_endpoint)
 
+    # Load the JSON request from a file
+    json_file = sys.argv[1]
+    with open(json_file, "r") as reader:
+        request = reader.read()
+
     # Send a request to the server
-    request = "Hello from client!"
     socket.send(request.encode())
 
     # Wait for a response from the server
