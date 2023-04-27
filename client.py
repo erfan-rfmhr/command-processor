@@ -4,6 +4,8 @@ import sys
 
 import zmq
 
+DEFAULT_JSON_FILE = "command.json"
+
 
 async def client():
     # Define the endpoint for the server
@@ -17,9 +19,17 @@ async def client():
     socket.connect(server_endpoint)
 
     # Load the JSON request from a file
-    json_file = sys.argv[1]
-    with open(json_file, "r") as reader:
-        request = reader.read()
+    try:
+        json_file = sys.argv[1]
+    except IndexError:
+        json_file = DEFAULT_JSON_FILE
+
+    try:
+        with open(json_file, "r") as reader:
+            request = reader.read()
+    except FileNotFoundError:
+        print(f"File not found: {json_file}")
+        sys.exit(2)
 
     # Send a request to the server
     socket.send(request.encode())
