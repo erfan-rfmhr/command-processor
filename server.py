@@ -1,5 +1,6 @@
 import zmq
 import os
+import asyncio
 
 
 async def server():
@@ -23,3 +24,11 @@ async def server():
 
         # Send a response back to the client
         socket.send(response.encode())
+
+
+async def main():
+    await server()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
