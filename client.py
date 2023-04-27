@@ -1,3 +1,4 @@
+import asyncio
 import zmq
 
 import os
@@ -21,3 +22,11 @@ async def client():
     # Wait for a response from the server
     response = socket.recv()
     print(f"Received response from server: {response.decode()}")
+
+
+async def main():
+    await client()
+
+
+if __name__ == "__main__":
+    asyncio.run(main())
