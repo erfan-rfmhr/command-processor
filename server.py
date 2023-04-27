@@ -1,11 +1,16 @@
-import zmq
-import os
 import asyncio
+import os
+
+import zmq
+from dotenv import load_dotenv
+
+load_dotenv()
+DEFAULT_SERVER_ENDPOINT = "tcp://localhost:5555"
 
 
 async def server():
     # Define the endpoint for the server
-    server_endpoint = os.getenv("SERVER_ENDPOINT", "tcp://*:5555")
+    server_endpoint = os.getenv("SERVER_ENDPOINT" or DEFAULT_SERVER_ENDPOINT)
 
     # Create a ZMQ context and socket
     context = zmq.Context()
