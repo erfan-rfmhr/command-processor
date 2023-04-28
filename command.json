@@ -1,0 +1,10 @@
+//{
+//  "command_type": "compute",
+//  "expression": "2+3"
+//}
+
+//{
+//    "command_type": "os",
+//    "command_name": "ls",
+//    "parameters": ["-l", "-a"]
+//}
