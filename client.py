@@ -61,6 +61,14 @@ async def client():
     response = socket.recv()
     # Decode the response and convert request to a dictionary
     execution_result = response.decode()
+    # Check if the command type is valid
+    if execution_result == "Invalid command type" or execution_result == "Invalid request format":
+        print(execution_result)
+        print("Please check the command type and format of the request.")
+        print("The request should be in the following format:")
+        print("{command_type: <os>, command_name: <command_name>, parameters: <parameters>}")
+        print("{command_type: <compute>, expression: <expression>}")
+        sys.exit(2)
 
     command_dict = json.loads(request)
     # Format the response

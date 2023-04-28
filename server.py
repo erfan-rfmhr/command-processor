@@ -45,11 +45,15 @@ async def server():
 
         # Process the request
         data = json.loads(request.decode())
-        response = ""
-        if data["command_type"] == "os":
-            response = await systemic_processing(data["command_name"], data["parameters"])
-        elif data["command_type"] == "compute":
-            response = await computational_command_processing(data["expression"])
+        try:
+            if data["command_type"] == "os":
+                response = await systemic_processing(data["command_name"], data["parameters"])
+            elif data["command_type"] == "compute":
+                response = await computational_command_processing(data["expression"])
+            else:
+                response = "Invalid command type"
+        except KeyError:
+            response = "Invalid request format"
 
         # Send a response back to the client
         socket.send(response.encode())
