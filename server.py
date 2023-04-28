@@ -1,6 +1,7 @@
 import asyncio
-import os
 import json
+import os
+
 import zmq
 from dotenv import load_dotenv
 
@@ -22,6 +23,11 @@ async def systemic_processing(command_name: str, parameters: list) -> str:
     return result.decode()
 
 
+async def computational_command_processing(expression: str) -> str:
+    result = eval(expression)
+    return str(result)
+
+
 async def server():
     # Define the endpoint for the server
     server_endpoint = os.getenv("SERVER_ENDPOINT", DEFAULT_SERVER_ENDPOINT)
@@ -39,7 +45,11 @@ async def server():
 
         # Process the request
         data = json.loads(request.decode())
-        response = await systemic_processing(data["command_name"], data["parameters"])
+        response = ""
+        if data["command_type"] == "os":
+            response = await systemic_processing(data["command_name"], data["parameters"])
+        elif data["command_type"] == "compute":
+            response = await computational_command_processing(data["expression"])
 
         # Send a response back to the client
         socket.send(response.encode())

@@ -3,6 +3,7 @@ import json
 import os
 import sys
 from pprint import pprint
+
 import zmq
 from dotenv import load_dotenv
 
@@ -11,10 +12,12 @@ DEFAULT_JSON_FILE = "command.json"
 DEFAULT_SERVER_ENDPOINT = "tcp://127.0.0.1:5555"
 
 
-def format_response(command_dict: dict, execution_result: str) -> dict:
+def format_response(given_command_type: str, command_dict: dict, execution_result: str) -> dict:
     """Format the response to be sent back to the client."""
+    math_expression = command_dict.get("expression", None)
     output = {
-        "given_os_command": command_dict["command_name"] + " " + " ".join(command_dict["parameters"]),
+        given_command_type: command_dict.get('command_name', math_expression) + " " + " ".join(
+            command_dict.get("parameters", [])),
         "result": execution_result
     }
     return output
@@ -24,7 +27,9 @@ async def client():
     """Send a request to the server and print the response.
     The request is loaded from a JSON file.
 
-    response format: {given_os_command: <command>, result: <result>}"""
+    os commands response format: {given_os_command: <command>, result: <result>}
+
+    compute commands response format: {given_math_expression: <expression>, result: <result>}"""
 
     # Define the endpoint for the server
     server_endpoint = os.getenv("SERVER_ENDPOINT", DEFAULT_SERVER_ENDPOINT)
@@ -56,9 +61,13 @@ async def client():
     response = socket.recv()
     # Decode the response and convert request to a dictionary
     execution_result = response.decode()
+
     command_dict = json.loads(request)
     # Format the response
-    output = format_response(command_dict, execution_result)
+    if command_dict["command_type"] == "compute":
+        output = format_response("given_math_expression", command_dict, execution_result)
+    else:
+        output = format_response("given_os_command", command_dict, execution_result)
     pprint(output, indent=4)
 
 
