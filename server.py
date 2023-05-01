@@ -41,6 +41,9 @@ async def server():
         except (json.JSONDecodeError, KeyError):
             response = "Invalid request format"
             error_logger.error(response)
+        except Exception as e:
+            response = 'Error: ' + str(e)
+            error_logger.error(response)
 
         # Send a response back to the client
         socket.send(response.encode())
