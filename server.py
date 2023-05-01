@@ -1,7 +1,7 @@
 import asyncio
 import json
 import os
-
+from logger import get_logger
 import zmq
 from dotenv import load_dotenv
 
@@ -29,6 +29,7 @@ async def computational_command_processing(expression: str) -> str:
 
 
 async def server():
+    error_logger = get_logger()
     # Define the endpoint for the server
     server_endpoint = os.getenv("SERVER_ENDPOINT", DEFAULT_SERVER_ENDPOINT)
 
@@ -44,16 +45,18 @@ async def server():
         request = socket.recv()
 
         # Process the request
-        data = json.loads(request.decode())
         try:
+            data = json.loads(request.decode())
             if data["command_type"] == "os":
                 response = await systemic_processing(data["command_name"], data["parameters"])
             elif data["command_type"] == "compute":
                 response = await computational_command_processing(data["expression"])
             else:
                 response = "Invalid command type"
-        except KeyError:
+        # If the request is not in JSON format or if the request is missing a key
+        except (json.JSONDecodeError, KeyError):
             response = "Invalid request format"
+            error_logger.error(response)
 
         # Send a response back to the client
         socket.send(response.encode())
