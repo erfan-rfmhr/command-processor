@@ -1,31 +1,15 @@
 import asyncio
 import json
 import os
-from logger import get_logger
+
 import zmq
 from dotenv import load_dotenv
 
+from logger import get_logger
+from utils import systemic_processing, computational_command_processing
+
 load_dotenv()
 DEFAULT_SERVER_ENDPOINT = "tcp://127.0.0.1:5555"
-
-
-async def systemic_processing(command_name: str, parameters: list) -> str:
-    """Perform some systemic processing on the command."""
-    proc = await asyncio.create_subprocess_exec(command_name, *parameters, stdout=asyncio.subprocess.PIPE,
-                                                stderr=asyncio.subprocess.PIPE)
-    await proc.wait()
-    result = await proc.stdout.read()
-
-    # If the result is empty, then there was an error
-    if result == b'':
-        result = await proc.stderr.read()
-
-    return result.decode()
-
-
-async def computational_command_processing(expression: str) -> str:
-    result = eval(expression)
-    return str(result)
 
 
 async def server():

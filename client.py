@@ -7,20 +7,11 @@ from pprint import pprint
 import zmq
 from dotenv import load_dotenv
 
+from utils import format_response
+
 load_dotenv()
 DEFAULT_JSON_FILE = "command.json"
 DEFAULT_SERVER_ENDPOINT = "tcp://127.0.0.1:5555"
-
-
-def format_response(given_command_type: str, command_dict: dict, execution_result: str) -> dict:
-    """Format the response to be sent back to the client."""
-    math_expression = command_dict.get("expression", None)
-    output = {
-        given_command_type: command_dict.get('command_name', math_expression) + " " + " ".join(
-            command_dict.get("parameters", [])),
-        "result": execution_result
-    }
-    return output
 
 
 async def client():
